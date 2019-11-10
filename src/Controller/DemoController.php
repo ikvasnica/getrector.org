@@ -4,19 +4,33 @@ declare(strict_types=1);
 
 namespace Rector\Website\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
+use Rector\Website\Form\RectorRunFormType;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-final class DemoController
+final class DemoController extends AbstractController
 {
-    use ControllerTrait;
-
     /**
      * @Route(path="demo", name="demo")
      */
-    public function __invoke(): Response
+    public function __invoke(Request $request): Response
     {
-        return $this->render('homepage/demo.twig');
+        $form = $this->createForm(RectorRunFormType::class);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $form = $this->createForm(RectorRunFormType::class);
+            $form->handleRequest($request);
+
+            dump($form->getData());
+            die;
+        }
+
+        dump(123);
+
+        return $this->render('homepage/demo.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 }
